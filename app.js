@@ -28,7 +28,8 @@ const $ = id => document.getElementById(id);
 let state = { version: 1, people: window.INITIAL_PARTICIPANTS.map(p => ({ ...p })), history: [] };
 let storageBlocked = false;
 let savedSnapshot = null;
-function message(text, error = false) { $('message').textContent = text; $('message').classList.toggle('error', error); }
+let adminUnlocked = false;
+function message(text, error = false) { const target = $(adminUnlocked ? 'admin-message' : 'message'); target.textContent = text; target.classList.toggle('error', error); }
 try {
   const saved = localStorage.getItem(STORAGE_KEY);
   savedSnapshot = saved;
@@ -64,30 +65,19 @@ function render() {
   const active = state.people.filter(p => p.status === 'active');
   $('eligible-count').textContent = active.length;
   $('won-count').textContent = state.people.filter(p => p.status === 'won').length;
-  $('excluded-count').textContent = state.people.filter(p => p.status === 'excluded').length;
-  $('total-count').textContent = `${state.people.length} osób`;
+  const visible = state.people.filter(p => p.status !== 'excluded');
+  $('total-count').textContent = `${visible.length} osób`;
   $('draw').disabled = storageBlocked || !active.length;
   $('participants').replaceChildren();
-  if (!state.people.length) $('participants').append(element('p', 'empty', 'Dodaj pierwszych uczestników poniżej.'));
-  state.people.forEach((person, index) => {
-    const row = element('div', `person ${person.status}`);
-    row.append(element('span', 'avatar', person.name.split(' ').slice(0,2).map(s => Array.from(s)[0]).join('')));
-    const info = element('div', 'person-info');
-    info.append(element('div', 'person-name', person.name), element('div', 'person-status', statuses[person.status]));
-    const select = element('select'); select.setAttribute('aria-label', `Status: ${person.name}`); select.disabled = storageBlocked;
-    Object.entries(statuses).forEach(([value, label]) => { const option = element('option', '', label); option.value = value; select.append(option); });
-    select.value = person.status;
-    select.addEventListener('change', () => {
-      if (person.status === 'won' && !window.confirm(`Przywrócić udział osoby ${person.name}? Jej wpis w historii zostanie usunięty.`)) { select.value = person.status; return; }
-      const next = structuredClone(state); next.people[index].status = select.value;
-      next.history = next.history.filter(h => keyFor(h.name) !== keyFor(person.name));
-      if (select.value === 'won') next.history.unshift({ name: person.name, date: new Date().toISOString(), source: 'manual' });
-      if (commit(next)) { clearWinner(); message('Status zapisany.'); }
-    });
-    row.append(info, select); $('participants').append(row);
+  if (!visible.length) $('participants').append(element('p', 'empty', 'Lista uczestników jest pusta.'));
+  visible.forEach(person => {
+    const row = personCard(person);
+    if (person.status === 'won') row.querySelector('.person-info').append(element('span', 'winner-badge', 'Już wygrał(a)'));
+    $('participants').append(row);
   });
+  renderAdmin();
   $('history').replaceChildren();
-  if (!state.history.length) $('history').append(element('li', 'empty', 'Tutaj pojawią się zwycięzcy. Osoby, które wygrały wcześniej, oznacz na liście jako „Już wygrał(a)”.'));
+  if (!state.history.length) $('history').append(element('li', 'empty', 'Tutaj pojawią się zwycięzcy kolejnych losowań.'));
   state.history.forEach(h => {
     const row = element('li');
     row.append(element('span', '', h.name));
@@ -95,9 +85,66 @@ function render() {
     date.dateTime = h.date; row.append(date); $('history').append(row);
   });
 }
+function personCard(person) {
+  const row = element('div', `person ${person.status}`);
+  row.append(element('span', 'avatar', person.name.split(' ').slice(0,2).map(s => Array.from(s)[0]).join('')));
+  const info = element('div', 'person-info');
+  info.append(element('div', 'person-name', person.name));
+  row.append(info);
+  return row;
+}
+function renderAdmin() {
+  $('admin-participants').replaceChildren();
+  if (!adminUnlocked) return;
+  state.people.forEach((person, index) => {
+    const row = personCard(person);
+    const controls = element('div', 'person-controls');
+    const select = element('select'); select.setAttribute('aria-label', `Status: ${person.name}`); select.disabled = storageBlocked;
+    Object.entries(statuses).forEach(([value, label]) => { const option = element('option', '', label); option.value = value; select.append(option); });
+    select.value = person.status;
+    select.addEventListener('change', () => {
+      if (!adminUnlocked || storageBlocked) return;
+      if (person.status === 'won' && !window.confirm(`Zmienić status osoby ${person.name}? Jej wpis w historii zostanie usunięty.`)) { select.value = person.status; return; }
+      const next = structuredClone(state); next.people[index].status = select.value;
+      next.history = next.history.filter(h => keyFor(h.name) !== keyFor(person.name));
+      if (select.value === 'won') next.history.unshift({ name: person.name, date: new Date().toISOString(), source: 'manual' });
+      if (commit(next)) { clearWinner(); message('Status zapisany.'); }
+    });
+    const remove = element('button', 'remove-person', 'Usuń'); remove.type = 'button'; remove.disabled = storageBlocked;
+    remove.setAttribute('aria-label', `Usuń: ${person.name}`);
+    remove.addEventListener('click', () => {
+      if (!adminUnlocked || storageBlocked || !window.confirm(`Usunąć osobę ${person.name} z listy? Jej historia wygranych również zostanie usunięta. Tej operacji nie można cofnąć bez kopii danych.`)) return;
+      const next = structuredClone(state);
+      next.people.splice(index, 1);
+      next.history = next.history.filter(h => keyFor(h.name) !== keyFor(person.name));
+      if (commit(next)) { clearWinner(); message('Osoba została usunięta.'); }
+    });
+    controls.append(select, remove); row.append(controls); $('admin-participants').append(row);
+  });
+}
+$('advanced-open').addEventListener('click', () => {
+  $('admin-password').value = ''; $('login-error').textContent = '';
+  $('login-dialog').showModal(); $('admin-password').focus();
+});
+$('login-cancel').addEventListener('click', () => $('login-dialog').close());
+$('login-dialog').addEventListener('close', () => { $('admin-password').value = ''; $('login-error').textContent = ''; });
+$('login-form').addEventListener('submit', event => {
+  event.preventDefault();
+  if ($('admin-password').value !== '1234') { $('login-error').textContent = 'Nieprawidłowe hasło.'; $('admin-password').select(); return; }
+  $('login-dialog').close(); adminUnlocked = true;
+  $('admin-message').textContent = ''; renderAdmin(); $('admin-dialog').showModal();
+});
+$('admin-close').addEventListener('click', () => { lockAdmin(); $('admin-dialog').close(); });
+function lockAdmin() {
+  adminUnlocked = false; $('admin-participants').replaceChildren();
+  $('names').value = ''; $('import').value = ''; $('admin-message').textContent = '';
+  $('message').textContent = ''; clearWinner(); render();
+}
+$('admin-dialog').addEventListener('close', lockAdmin);
+$('admin-dialog').addEventListener('cancel', lockAdmin);
 function clearWinner() { $('winner').textContent = 'Twój zwycięzca czeka na swój moment.'; $('result-note').textContent = 'Zwycięzca automatycznie wypada z kolejnych losowań.'; }
 $('add').addEventListener('click', () => {
-  if (storageBlocked) return;
+  if (!adminUnlocked || storageBlocked) return;
   const next = structuredClone(state), seen = new Set(next.people.map(p => keyFor(p.name)));
   let count = 0;
   $('names').value.split(/\r?\n/).map(normalize).filter(Boolean).forEach(name => {
@@ -120,6 +167,7 @@ $('draw').addEventListener('click', () => {
   }
 });
 $('export').addEventListener('click', () => {
+  if (!adminUnlocked) return;
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob), link = element('a');
   link.href = url; link.download = `szczesliwy-los-${new Date().toISOString().slice(0,10)}.json`;
@@ -127,10 +175,11 @@ $('export').addEventListener('click', () => {
   message('Pobrano kopię listy i historii.');
 });
 $('import').addEventListener('change', async () => {
-  const file = $('import').files[0]; if (!file) return;
+  const file = $('import').files[0]; if (!adminUnlocked || !file) return;
   try {
     if (file.size > 5 * 1024 * 1024) throw new Error('Kopia jest zbyt duża (maksymalnie 5 MB).');
     const next = validateState(JSON.parse(await file.text()));
+    if (!adminUnlocked) return;
     if (window.confirm('Wczytanie kopii zastąpi obecną listę i historię. Kontynuować?') && commit(next)) { clearWinner(); message('Wczytano i zapisano listę oraz historię.'); }
   } catch { message('Nie można wczytać pliku. Wybierz poprawną kopię JSON pobraną z programu (maksymalnie 5 MB).', true); }
   finally { $('import').value = ''; }

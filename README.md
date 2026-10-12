@@ -15,7 +15,7 @@ Nie są potrzebne żadne zależności. Listę początkową definiuje `initial-pa
 
 ## Udział i historia
 
-Każda osoba ma status: „Bierze udział”, „Już wygrał(a)” albo „Nie bierze udziału”. Przed pierwszym losowaniem oznacz wcześniejszych zwycięzców. Losowanie obejmuje wyłącznie aktywne osoby; wybrany zwycięzca jest zapisywany i skreślany z listy. Przywrócenie zwycięzcy wymaga potwierdzenia i usuwa jego wpis w historii. Ręcznie oznaczeni wcześniejsi zwycięzcy nie mają przypisanej fikcyjnej daty wygranej — zapis zawiera datę dodania wpisu, a ekran pokazuje „Wcześniejsza wygrana”.
+Każda osoba ma status: „Bierze udział”, „Już wygrał(a)” albo „Nie bierze udziału”. Przed pierwszym losowaniem oznacz wcześniejszych zwycięzców w panelu „Zaawansowane”. Losowanie obejmuje wyłącznie aktywne osoby; wybrany zwycięzca jest zapisywany i skreślany z listy. Przywrócenie zwycięzcy wymaga potwierdzenia i usuwa jego wpis w historii. Ręcznie oznaczeni wcześniejsi zwycięzcy nie mają przypisanej fikcyjnej daty wygranej — zapis zawiera datę dodania wpisu, a ekran pokazuje „Wcześniejsza wygrana”.
 
 ## Zapis i kopie
 
@@ -39,3 +39,10 @@ Strona jest publiczna, również jej lista początkowa. Historia i zmiany status
 ## Oprawa Label Art
 
 Kolorystyka niebiesko-grafitowa bazuje na przekazanym wzorze logo. Nagłówek zawiera tekst LABEL ART, bez odtworzonego znaku graficznego. Style i skrypty są lokalne, dlatego program działa bez internetu. Zmiana oprawy nie zmienia klucza pamięci ani historii losowań. W stopce znajduje się podpis „Created by. Dawid Wosiek”.
+
+
+## Panel zaawansowany i widok losowania
+
+Przycisk „Zaawansowane” otwiera panel po wpisaniu hasła `1234`. Tam dostępna jest pełna lista, zmiana statusu, dodawanie i usuwanie osób oraz eksport/import kopii. Zwykły widok pomija wykluczone osoby i nie pokazuje ich liczby ani kontrolek statusu. Wygrani nadal są widoczni na liście i w historii. Zamknięcie panelu, Escape lub odświeżenie blokują go ponownie; lista zarządzania jest usuwana z DOM. Usunięcie osoby wymaga potwierdzenia i usuwa także jej wpisy w historii.
+
+Hasło chroni widok interfejsu, a nie dostęp do danych w pliku lub pamięci przeglądarki. To aplikacja lokalna bez uwierzytelniania serwerowego; kopia JSON zawiera pełną listę i statusy.

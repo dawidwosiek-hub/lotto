@@ -75,3 +75,37 @@ h1 em { font-style: normal; font-weight: 750; }
 .stat-icon { font-weight: 650; }
 .footer-brand { font-weight: 750; letter-spacing: 1px; color: #0068c8; }
 @media(max-width:620px) { .brand { font-size: 21px; } h1 { font-size: 43px; } .draw-card h2 { font-size: 25px; } }
+
+/* Czytelne karty uczestników i osobny panel zarządzania. */
+[hidden] { display: none !important; }
+.stats { grid-template-columns: repeat(2, 1fr); }
+#participants { display: grid; gap: 14px; }
+#participants .person { margin: 0; padding: 19px 18px; background: #f8fbff; border: 1px solid #d1e2f5; border-left: 4px solid #0068c8; border-radius: 12px; box-shadow: 0 3px 10px #0054ae08; gap: 15px; flex-wrap: nowrap; }
+#participants .avatar { width: 45px; height: 45px; font-size: 13px; }
+#participants .person-name { font-size: 16px; font-weight: 650; line-height: 1.5; }
+#participants .person.won { background: #f5f6f8; border-color: #dee3eb; border-left-color: #8e9aad; }
+.winner-badge { display: inline-block; font-size: 10px; color: #60728a; background: #e8edf4; border-radius: 20px; padding: 4px 9px; margin-top: 5px; }
+.advanced-entry { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 22px 0 0; color: #687280; font-size: 12px; }
+dialog { border: 1px solid #dce4ee; border-radius: 18px; padding: 26px; color: var(--ink); box-shadow: 0 25px 80px #14294240; max-height: 85vh; overflow-y: auto; }
+dialog::backdrop { background: #182a49a6; backdrop-filter: blur(4px); }
+.login-dialog { width: min(420px, calc(100% - 32px)); }
+.admin-dialog { width: min(800px, calc(100% - 32px)); }
+#admin-password { width: 100%; padding: 12px; border: 1px solid #c8d6e8; border-radius: 9px; font: inherit; }
+#admin-password:focus-visible { outline: 3px solid #6baff0; outline-offset: 2px; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.primary { background: #0068c8; color: white; }
+#login-error, #admin-message.error { color: #b43838; font-size: 12px; }
+#admin-message { font-size: 12px; color: #1762a5; }
+.person-controls { display: flex; gap: 8px; align-items: center; }
+.remove-person { background: #fff1f1; color: #aa3544; border: 1px solid #f1d1d5; padding: 9px 12px; }
+#admin-participants select { max-width: none; margin: 0; font-size: 12px; }
+#admin-participants .person { flex-wrap: nowrap; }
+@media(max-width:620px) {
+  #participants .person { padding: 15px 12px; gap: 11px; }
+  #participants .person-name { font-size: 14px; }
+  #participants .avatar { width: 38px; height: 38px; }
+  dialog { padding: 20px; }
+  #admin-participants .person { flex-wrap: wrap; }
+  .person-controls { width: 100%; justify-content: flex-end; }
+  .admin-dialog .section-heading { flex-wrap: wrap; }
+}
