@@ -1,4 +1,4 @@
-# Szczęśliwy los
+# Label Art — Szczęśliwy los
 
 Strona do comiesięcznego losowania jednego zwycięzcy. Początkowa lista zawiera Dawida Wosieka, Grzegorza Ferenca i Weronikę. Można dodawać kolejne osoby.
 
@@ -34,3 +34,8 @@ Po umieszczeniu projektu na GitHub workflow „Przygotuj program do pobrania” 
 Workflow „Opublikuj stronę” przygotowuje i publikuje cały projekt po zmianach na `main`. W repozytorium GitHub w **Settings → Pages → Build and deployment → Source** wybierz **GitHub Actions**. Repozytorium musi obsługiwać Pages na używanym planie GitHub. Po wysłaniu plików i poprawnym wdrożeniu strona będzie pod adresem `https://dawidwosiek-hub.github.io/lotto/`. To adres docelowy, a nie potwierdzenie wdrożenia. Status publikacji sprawdź w **Actions → Opublikuj stronę**.
 
 Strona jest publiczna, również jej lista początkowa. Historia i zmiany statusów są przechowywane wyłącznie lokalnie w przeglądarce; aktualizacje strony ich nie zerują. Używaj tego samego adresu i profilu przeglądarki, a po każdym losowaniu zachowaj kopię danych. Aktualizacja pliku z listą początkową nie zastępuje już zapisanej listy w przeglądarce — nowe osoby dodaj przyciskiem w aplikacji.
+
+
+## Oprawa Label Art
+
+Kolorystyka niebiesko-grafitowa bazuje na przekazanym wzorze logo. Plik `assets/label-art-logo.svg` jest wektorowym odtworzeniem tego wzoru, a nie oryginalnym plikiem identyfikacji firmy. Można go zastąpić oryginalnym SVG. Logo, style i skrypty są lokalne, dlatego program działa bez internetu. Zmiana oprawy nie zmienia klucza pamięci ani historii losowań.
