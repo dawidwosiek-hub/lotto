@@ -1,0 +1,21 @@
+name: Przygotuj program do pobrania
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Zbuduj paczkę programu
+        run: python3 scripts/package.py
+      - name: Udostępnij gotowy program
+        uses: actions/upload-artifact@v4
+        with:
+          name: szczesliwy-los
+          path: dist/site/
+          if-no-files-found: error
+          retention-days: 90
