@@ -38,4 +38,4 @@ Strona jest publiczna, również jej lista początkowa. Historia i zmiany status
 
 ## Oprawa Label Art
 
-Kolorystyka niebiesko-grafitowa bazuje na przekazanym wzorze logo. Plik `assets/label-art-logo.svg` jest wektorowym odtworzeniem tego wzoru, a nie oryginalnym plikiem identyfikacji firmy. Można go zastąpić oryginalnym SVG. Logo, style i skrypty są lokalne, dlatego program działa bez internetu. Zmiana oprawy nie zmienia klucza pamięci ani historii losowań.
+Kolorystyka niebiesko-grafitowa bazuje na przekazanym wzorze logo. Nagłówek zawiera tekst LABEL ART, bez odtworzonego znaku graficznego. Style i skrypty są lokalne, dlatego program działa bez internetu. Zmiana oprawy nie zmienia klucza pamięci ani historii losowań. W stopce znajduje się podpis „Created by. Dawid Wosiek”.
